@@ -21,6 +21,14 @@ const list = [
   },
 ];
 
+function isSearched(searchTerm) {
+  // console.log(1)
+  return function(item) {
+    // условие, возвращающее true или false
+    return item.title.toLowerCase().includes(searchTerm.toLowerCase());
+  }
+}
+
 class App extends Component {
 
   constructor(props) {
@@ -28,11 +36,13 @@ class App extends Component {
 
     this.state = {
       list,
-      isToggleOn: true
+      isToggleOn: true,
+      searchTerm: ''
     }
 
     this.onDismiss = this.onDismiss.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.onSearchChange = this.onSearchChange.bind(this);
   }
 
   onDismiss(id) {
@@ -47,11 +57,18 @@ class App extends Component {
     this.setState({ isToggleOn: !this.state.isToggleOn })
   }
 
+  onSearchChange(event) {
+    this.setState({ searchTerm: event.target.value });
+  }
+
   render() {
     // console.log(this);
     return (
       <div className="App">
-        {this.state.list.map(item => {
+        <form>
+          <input type="text" onChange={this.onSearchChange} />
+        </form>
+        {this.state.list.filter(isSearched(this.state.searchTerm)).map(item => {
           return (
             <div key={item.objectID}>
               <span>
