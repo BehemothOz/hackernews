@@ -21,7 +21,7 @@ const list = [
   },
 ];
 
-function isSearched(searchTerm) {
+function isSearched(searchTerm) { // TEST!
   // console.log(1)
   return function(item) {
     // условие, возвращающее true или false
@@ -63,34 +63,76 @@ class App extends Component {
 
   render() {
     // console.log(this);
+    const { searchTerm, list } = this.state;
+
     return (
       <div className="App">
-        <form>
-          <input type="text" onChange={this.onSearchChange} />
-        </form>
-        {this.state.list.filter(isSearched(this.state.searchTerm)).map(item => {
-          return (
-            <div key={item.objectID}>
-              <span>
-                <a href={item.url}>{item.title}</a>
-              </span>
-              <span>{item.author}</span>
-              <span>{item.num_comments}</span>
-              <span>{item.points}</span>
-              <span>
-                <button onClick={this.onDismiss.bind(this, item.objectID)} type="button">
-                  Отбросить
-                </button>
-              </span>
-              <span>
-                <button onClick={this.handleClick}>
-                  {this.state.isToggleOn ? 'ON' : 'OFF'}
-                </button>
-              </span>
-            </div>
-          )
-        })}
+        <Search value={searchTerm} onChange={this.onSearchChange}>Поиск</Search>
+        <Table list={list} pattern={searchTerm} onDismiss={this.onDismiss}/>
       </div>
+    );
+  }
+}
+
+class Search extends Component {
+  render() {
+    const { value, onChange, children } = this.props;
+
+    return (
+      <form>
+        <input
+          type="text"
+          value={value}
+          onChange={onChange}
+          placeholder={children}
+        />
+      </form>
+    );
+  }
+}
+
+class Table extends Component {
+  render() {
+    const { list, pattern, onDismiss } = this.props;
+
+    return (
+      <div>
+        {list.filter(isSearched(pattern)).map(item =>
+          <div key={item.objectID}>
+            <span>
+              <a href={item.url}>{item.title}</a>
+            </span>
+            <span>{item.author}</span>
+            <span>{item.num_comments}</span>
+            <span>{item.points}</span>
+            <span>
+              {/* <button
+                onClick={() => onDismiss(item.objectID)}
+                type="button"
+              >
+                Отбросить
+              </button> */}
+              <Button onClick={() => onDismiss(item.objectID)}>Отбросить</Button>
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
+}
+
+class Button extends Component {
+  render() {
+    const { onClick, className = '', children } = this.props;
+
+    return (
+      <button
+        onClick={onClick}
+        className={className}
+        type="button"
+      >
+        {children}
+      </button>
     );
   }
 }
