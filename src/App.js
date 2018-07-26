@@ -2,27 +2,13 @@ import React, { Component } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 
-const list = [
-  {
-    title: 'React',
-    url: 'https://reactjs.org/',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: 'Redux',
-    url: 'https://redux.js.org/',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-];
+const DEFAULT_QUERY = 'redux';
+
+const PATH_BASE = 'https://hn.algolia.com/api/v1';
+const PATH_SEARCH = '/search';
+const PARAM_SEARCH = 'query=';
 
 function isSearched(searchTerm) { // TEST!
-  // console.log(1)
   return function(item) {
     // условие, возвращающее true или false
     return item.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -35,26 +21,37 @@ class App extends Component {
     super(props);
 
     this.state = {
-      list,
-      isToggleOn: true,
-      searchTerm: ''
+      // list,
+      searchTerm: '',
+
+      result: null,
+      searchTerm: DEFAULT_QUERY,
     }
 
     this.onDismiss = this.onDismiss.bind(this);
-    this.handleClick = this.handleClick.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+    this.setSearchTopStories = this.setSearchTopStories.bind(this);
+  }
+
+  setSearchTopStories(result) {
+    this.setState({ result });
+  }
+
+  componentDidMount() {
+    const { searchTerm } = this.state;
+
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
+      .then(response => response.json())
+      .then(result => this.setSearchTopStories(result))
+      .catch(error => error);
   }
 
   onDismiss(id) {
     const isNotId = item => item.objectID !== id;
-    const updatedList = this.state.list.filter(isNotId);
+    const updatedHits = this.state.result.hits.filter(isNotId);
 
-    this.setState({ list: updatedList });
-  }
-
-  handleClick() {
-    console.log(this);
-    this.setState({ isToggleOn: !this.state.isToggleOn })
+    // this.setState({ result: Object.assign({}, this.state.result, { hits: updatedHits }) }); // 1 способ
+    this.setState({ result: { ...this.state.result, hits: updatedHits } }); // 2 способ
   }
 
   onSearchChange(event) {
@@ -62,15 +59,18 @@ class App extends Component {
   }
 
   render() {
-    // console.log(this);
-    const { searchTerm, list } = this.state;
+    const { searchTerm, result } = this.state; // ПОтестить
+    console.log(result)
+
+    // if (!result) { return null; }
 
     return (
       <div className="page">
         <div className="interactions">
           <Search value={searchTerm} onChange={this.onSearchChange}>Поиск</Search>
         </div>
-        <Table list={list} pattern={searchTerm} onDismiss={this.onDismiss}/>
+        {result && <Table list={result.hits} pattern={searchTerm} onDismiss={this.onDismiss}/>}
+        {/* {result ? <Table/> : null} - 2 вариант условной отрисовки*/}
       </div>
     );
   }
@@ -134,7 +134,5 @@ const Button = ({ onClick, className = '', children }) =>
     {children}
   </button>
 
-
-// console.log(new App());
 
 export default App;
