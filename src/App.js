@@ -21,6 +21,7 @@ class App extends Component {
 
   setSearchTopStories(result) {
     const { hits, page } = result;
+    console.log(result)
 
     const oldHits = page !== 0
       ? this.state.result.hits
@@ -42,7 +43,7 @@ class App extends Component {
     this.fetchSearchTopStories(searchTerm);
   }
 
-  fetchSearchTopStories(searchTerm, page = 0) {
+  fetchSearchTopStories = (searchTerm, page = 0) => {
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
