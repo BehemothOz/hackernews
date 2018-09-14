@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import * as api from '../../api';
 
 import Search from '../Search';
 import Table from '../Table';
@@ -6,17 +7,10 @@ import Button from '../Button';
 
 import './style.css';
 
-const DEFAULT_QUERY = 'redux';
-
-const PATH_BASE = 'https://hn.algolia.com/api/v1';
-const PATH_SEARCH = '/search';
-const PARAM_SEARCH = 'query=';
-const PARAM_PAGE = 'page=';
-
 class App extends Component {
   state = {
     result: null,
-    searchTerm: DEFAULT_QUERY,
+    searchTerm: api.DEFAULT_QUERY,
   }
 
   componentDidMount() {
@@ -26,7 +20,6 @@ class App extends Component {
 
   setSearchTopStories(result) {
     const { hits, page } = result;
-    console.log(result)
 
     const oldHits = page !== 0
       ? this.state.result.hits
@@ -43,13 +36,14 @@ class App extends Component {
   }
 
   onSearchSubmit = (e) => {
-    const { searchTerm } = this.state;
     e.preventDefault();
+
+    const { searchTerm } = this.state;
     this.fetchSearchTopStories(searchTerm);
   }
 
   fetchSearchTopStories = (searchTerm, page = 0) => {
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`)
+    fetch(`${api.PATH_BASE}${api.PATH_SEARCH}?${api.PARAM_SEARCH}${searchTerm}&${api.PARAM_PAGE}${page}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
       .catch(error => error);
@@ -58,8 +52,6 @@ class App extends Component {
   onDismiss = (id) => () => {
     const { result } = this.state;
     const updatedHits = result.hits.filter(item => item.objectID !== id);
-
-    console.log(id)
 
     this.setState({ result: {...result, hits: updatedHits} });
   }
@@ -71,7 +63,6 @@ class App extends Component {
 
   render() {
     const { result, searchTerm } = this.state;
-    console.log(!!result)
     const page = (result && result.page) || 0;
 
     return (
