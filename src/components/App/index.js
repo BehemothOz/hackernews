@@ -12,6 +12,7 @@ class App extends Component {
     results: null,
     searchKey: '',
     searchTerm: api.DEFAULT_QUERY,
+    error: null
   }
 
   componentDidMount() {
@@ -58,7 +59,7 @@ class App extends Component {
     fetch(`${api.PATH_BASE}${api.PATH_SEARCH}?${api.PARAM_SEARCH}${searchTerm}&${api.PARAM_PAGE}${page}`)
       .then(response => response.json())
       .then(result => this.setSearchTopStories(result))
-      .catch(error => error);
+      .catch(error => this.setState({ error: error }));
   }
 
   needsToSearchTopStories(searchTerm) {
@@ -89,7 +90,8 @@ class App extends Component {
     const {
       searchTerm,
       results,
-      searchKey
+      searchKey,
+      error
     } = this.state;
 
     const page = (
@@ -107,10 +109,15 @@ class App extends Component {
     return (
       <div className="App">
         <Search value={searchTerm} onChange={this.onSearchChange} onSubmit={this.onSearchSubmit}>Поиск</Search>
-        <Table
-          list={list}
-          onDismiss={this.onDismiss}
-        />
+        { error
+          ? <div className="interactions">
+            <p>Something went wrong.</p>
+          </div>
+          : <Table
+            list={list}
+            onDismiss={this.onDismiss}
+          />
+        }
 
         <div className="interactions">
           <Button onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
