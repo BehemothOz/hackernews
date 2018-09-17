@@ -17,7 +17,7 @@ const Table = ({ list, pattern, onDismiss }) => {
               onClick={onDismiss(item.objectID)}
               type="button"
             >
-              Отбросить
+              Remove
             </Button>
           </span>
         </div>

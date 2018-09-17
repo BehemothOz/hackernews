@@ -108,7 +108,7 @@ class App extends Component {
 
     return (
       <div className="App">
-        <Search value={searchTerm} onChange={this.onSearchChange} onSubmit={this.onSearchSubmit}>Поиск</Search>
+        <Search value={searchTerm} onChange={this.onSearchChange} onSubmit={this.onSearchSubmit}>Search</Search>
         { error
           ? <div className="interactions">
             <p>Something went wrong.</p>
@@ -121,7 +121,7 @@ class App extends Component {
 
         <div className="interactions">
           <Button onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
-            Больше историй
+            More
           </Button>
         </div>
       </div>
